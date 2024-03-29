@@ -86,7 +86,7 @@ def plot_categorical_features(df):
 
     # Select object, category, and boolean columns, and numerical columns with fewer than 25 unique values
     categorical_features = df.select_dtypes(include=['object', "category", "bool"]).columns.tolist() + \
-                           [col for col in df.select_dtypes(include=np.number).columns if df[col].nunique() < 25]
+                           [col for col in df.select_dtypes(include=np.number).columns if df[col].nunique() <= 27]
 
     rows = math.ceil(len(categorical_features) / 3)  # Calculate the number of rows required
 
@@ -110,7 +110,7 @@ def plot_categorical_features(df):
                               va='center',
                               xytext=(0, 10),
                               textcoords='offset points',
-                              fontsize=16)
+                              fontsize=12)
 
         ax.set_title(i, fontsize=22)
         sns.despine()
@@ -144,7 +144,7 @@ def plot_continuous_features(df):
     continuous_features = []
 
     for i in df.select_dtypes('number').columns:
-        if len(df[i].unique()) > 25:  # Condition for continuous features
+        if len(df[i].unique()) > 27:  # Condition for continuous features
             continuous_features.append(i)
 
             fig, ax = plt.subplots(1, 3, figsize=(20, 6))
