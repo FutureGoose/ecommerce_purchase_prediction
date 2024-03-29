@@ -303,5 +303,6 @@ def display_roc_curve(model, X_train, y_train, X_val, y_val, display_val=False):
         ax.set_title('ROC Curve (Training)')
         plt.tight_layout()
         plt.show()
+        
 
 
