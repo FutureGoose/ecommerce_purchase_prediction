@@ -5,6 +5,69 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, ConfusionMatrixDisplay, confusion_matrix, RocCurveDisplay
+from prettytable import PrettyTable
+
+
+def display_search_results(search_estimator, X_train=None, y_train=None, X_val=None, y_val=None):
+    """
+    Display hyperparameter tuning results and classification reports for training and validation datasets.
+
+    Summarizes the results of hyperparameter tuning from a trained GridSearchCV
+    or RandomizedSearchCV for classification models. If training data (`X_train` and `y_train`)
+    is provided, it displays the classification report for the training dataset. If validation data
+    (`X_val` and `y_val`) is provided, it also displays the classification report for the validation dataset.
+
+    Parameters
+    ----------
+    search_estimator : sklearn estimator
+        Trained instance of GridSearchCV or RandomizedSearchCV.
+    X_train : array-like, shape (n_samples, n_features), optional
+        Training dataset to compute training metrics. Default is None.
+    y_train : array-like, shape (n_samples, ), optional
+        Actual labels for `X_train`. Used only if `X_train` is provided. Default is None.
+    X_val : array-like, shape (n_samples, n_features), optional
+        Validation dataset to compute additional metrics. Default is None.
+    y_val : array-like, shape (n_samples, ), optional
+        Actual labels for `X_val`. Used only if `X_val` is provided. Default is None.
+
+    Returns
+    -------
+    None
+        Outputs the tuning results and classification reports to the console.
+
+    Notes
+    -----
+    Assumes `search_estimator` is a fit instance of GridSearchCV or RandomizedSearchCV.
+    The model's name is extracted from `search_estimator` for the results table title.
+    """
+
+    # Extract the model name from the estimator
+    model_name = search_estimator.estimator.steps[-1][1].__class__.__name__
+    title = f"{model_name} Tuning Results"
+
+    # PrettyTable display for tuning results
+    myTable = PrettyTable(["Parameter", "Value"])
+
+    if hasattr(search_estimator, 'best_params_'):
+        for key, value in search_estimator.best_params_.items():
+            myTable.add_row([key, value])
+    else:
+        myTable.add_row(["No parameters found", "N/A"])
+
+    myTable.title = title
+    print(myTable)
+
+    # Display classification report for the training set if provided
+    if X_train is not None and y_train is not None:
+        y_train_pred = search_estimator.predict(X_train)
+        print("Classification Report - Training Set:")
+        print(classification_report(y_train, y_train_pred))
+
+    # Display classification report for the validation set if provided
+    if X_val is not None and y_val is not None:
+        y_val_pred = search_estimator.predict(X_val)
+        print("Classification Report - Validation Set:")
+        print(classification_report(y_val, y_val_pred))
 
 def split_data(df, target_var, verbose=True):
     """
