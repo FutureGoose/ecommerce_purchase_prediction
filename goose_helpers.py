@@ -41,8 +41,14 @@ def display_search_results(search_estimator, X_train=None, y_train=None, X_val=N
     The model's name is extracted from `search_estimator` for the results table title.
     """
 
-    # Extract the model name from the estimator
-    model_name = search_estimator.estimator.steps[-1][1].__class__.__name__
+    # Determine model name based on whether it's part of a pipeline
+    if hasattr(search_estimator, 'estimator') and hasattr(search_estimator.estimator, 'steps'):
+        # It's a pipeline
+        model_name = search_estimator.estimator.steps[-1][1].__class__.__name__
+    else:
+        # Direct model
+        model_name = search_estimator.best_estimator_.__class__.__name__
+
     title = f"{model_name} Tuning Results"
 
     # PrettyTable display for tuning results
