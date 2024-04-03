@@ -249,9 +249,9 @@ def plot_continuous_features(df):
 
     return continuous_features
 
-def display_classification_report(model, X_train, y_train, X_val, y_val, display_val=False):
+def display_classification_report(model, X_train, y_train, X_val=None, y_val=None, data_to_display='train'):
     """
-    Display classification report for training and optionally validation sets.
+    Display classification report for specified data sets: training, validation, or both.
 
     Parameters
     ----------
@@ -261,31 +261,33 @@ def display_classification_report(model, X_train, y_train, X_val, y_val, display
         Training input samples.
     y_train : pd.Series
         Training target values.
-    X_val : pd.DataFrame
-        Validation input samples.
-    y_val : pd.Series
-        Validation target values.
-    display_val : bool, default=False
-        Whether to display the classification report for the validation set.
+    X_val : pd.DataFrame, optional
+        Validation input samples. Required if data_to_display is 'validation' or 'both'.
+    y_val : pd.Series, optional
+        Validation target values. Required if data_to_display is 'validation' or 'both'.
+    data_to_display : str, default='train'
+        Which data's classification report to display: 'train', 'validation', or 'both'.
     """
-    # Generate predictions for training set
-    y_train_pred = model.predict(X_train)
+    if data_to_display in ['train', 'both']:
+        # Generate predictions for training set
+        y_train_pred = model.predict(X_train)
+        # Print classification report for training set
+        print("Classification Report (Training):")
+        print(classification_report(y_train, y_train_pred))
 
-    # Print classification report for training set
-    print("Classification Report (Training):")
-    print(classification_report(y_train, y_train_pred))
+    if data_to_display in ['validation', 'both']:
+        if X_val is not None and y_val is not None:
+            # Generate predictions for validation set
+            y_val_pred = model.predict(X_val)
+            # Print classification report for validation set
+            print("\nClassification Report (Validation):")
+            print(classification_report(y_val, y_val_pred))
+        else:
+            print("Validation data not provided for requested 'validation' or 'both' reports.")
 
-    if display_val:
-        # Generate predictions for validation set
-        y_val_pred = model.predict(X_val)
-
-        # Print classification report for validation set
-        print("\nClassification Report (Validation):")
-        print(classification_report(y_val, y_val_pred))
-
-def display_confusion_matrix(model, X_train, y_train, X_val, y_val, display_val=False):
+def display_confusion_matrix(model, X_train, y_train, X_val=None, y_val=None, data_to_display='train'):
     """
-    Display confusion matrix for training and optionally validation sets.
+    Display confusion matrix for specified data sets: training, validation, or both.
 
     Parameters
     ----------
@@ -295,48 +297,49 @@ def display_confusion_matrix(model, X_train, y_train, X_val, y_val, display_val=
         Training input samples.
     y_train : pd.Series
         Training target values.
-    X_val : pd.DataFrame
-        Validation input samples.
-    y_val : pd.Series
-        Validation target values.
-    display_val : bool, default=False
-        Whether to display the confusion matrix for the validation set.
+    X_val : pd.DataFrame, optional
+        Validation input samples. Required if data_to_display is 'validation' or 'both'.
+    y_val : pd.Series, optional
+        Validation target values. Required if data_to_display is 'validation' or 'both'.
+    data_to_display : str, default='train'
+        Which data's confusion matrix to display: 'train', 'validation', or 'both'.
     """
-    # Generate predictions for training set
-    y_train_pred = model.predict(X_train)
-
-    # Calculate confusion matrix for training set
-    cm_train = confusion_matrix(y_train, y_train_pred)
-
-    # Set figure size
     fig_size = (10, 5)
 
-    if display_val:
-        # Generate predictions for validation set
-        y_val_pred = model.predict(X_val)
+    if data_to_display in ['train', 'both']:
+        # Generate and plot confusion matrix for training set
+        y_train_pred = model.predict(X_train)
+        cm_train = confusion_matrix(y_train, y_train_pred)
+        if data_to_display == 'train':
+            fig, ax = plt.subplots(1, 1, figsize=fig_size)
+            ConfusionMatrixDisplay(confusion_matrix=cm_train).plot(ax=ax)
+            ax.set_title('Confusion Matrix (Training)')
+        else:  # If both, prepare subplot and plot training CM first
+            fig, axes = plt.subplots(1, 2, figsize=(fig_size[0] * 2, fig_size[1]))
+            ConfusionMatrixDisplay(confusion_matrix=cm_train).plot(ax=axes[0])
+            axes[0].set_title('Confusion Matrix (Training)')
 
-        # Calculate confusion matrix for validation set
-        cm_val = confusion_matrix(y_val, y_val_pred)
+    if data_to_display in ['validation', 'both']:
+        if X_val is not None and y_val is not None:
+            # Generate and plot confusion matrix for validation set
+            y_val_pred = model.predict(X_val)
+            cm_val = confusion_matrix(y_val, y_val_pred)
+            if data_to_display == 'validation':
+                fig, ax = plt.subplots(1, 1, figsize=fig_size)
+                ConfusionMatrixDisplay(confusion_matrix=cm_val).plot(ax=ax)
+                ax.set_title('Confusion Matrix (Validation)')
+            else:  # For 'both', plot validation CM in second subplot
+                ConfusionMatrixDisplay(confusion_matrix=cm_val).plot(ax=axes[1])
+                axes[1].set_title('Confusion Matrix (Validation)')
+        else:
+            print("Validation data not provided for requested 'validation' or 'both' reports.")
 
-        # Plot confusion matrices side by side
-        fig, axes = plt.subplots(1, 2, figsize=fig_size)
-        ConfusionMatrixDisplay(confusion_matrix=cm_train).plot(ax=axes[0])
-        axes[0].set_title('Confusion Matrix (Training)')
-        ConfusionMatrixDisplay(confusion_matrix=cm_val).plot(ax=axes[1])
-        axes[1].set_title('Confusion Matrix (Validation)')
-        plt.tight_layout()
-        plt.show()
-    else:
-        # Plot confusion matrix for training set only
-        fig, ax = plt.subplots(1, 1, figsize=fig_size)
-        ConfusionMatrixDisplay(confusion_matrix=cm_train).plot(ax=ax)
-        ax.set_title('Confusion Matrix (Training)')
-        plt.tight_layout()
-        plt.show()
+    plt.tight_layout()
+    plt.show()
 
-def display_roc_curve(model, X_train, y_train, X_val, y_val, display_val=False):
+def display_roc_curve(model, X_train, y_train, X_val=None, y_val=None, data_to_display='train'):
     """
-    Display ROC curve for training and optionally validation sets.
+    Display ROC curve for specified data sets: training, validation, or both.
 
     Parameters
     ----------
@@ -346,32 +349,40 @@ def display_roc_curve(model, X_train, y_train, X_val, y_val, display_val=False):
         Training input samples.
     y_train : pd.Series
         Training target values.
-    X_val : pd.DataFrame
-        Validation input samples.
-    y_val : pd.Series
-        Validation target values.
-    display_val : bool, default=False
-        Whether to display the ROC curve for the validation set.
+    X_val : pd.DataFrame, optional
+        Validation input samples. Required if data_to_display is 'validation' or 'both'.
+    y_val : pd.Series, optional
+        Validation target values. Required if data_to_display is 'validation' or 'both'.
+    data_to_display : str, default='train'
+        Which data's ROC curve to display: 'train', 'validation', or 'both'.
     """
-    # Set figure size
     fig_size = (10, 5)
 
-    if display_val:
-        # Plot ROC curves side by side
-        fig, axes = plt.subplots(1, 2, figsize=fig_size)
-        RocCurveDisplay.from_estimator(model, X_train, y_train, ax=axes[0])
-        axes[0].set_title('ROC Curve (Training)')
-        RocCurveDisplay.from_estimator(model, X_val, y_val, ax=axes[1])
-        axes[1].set_title('ROC Curve (Validation)')
-        plt.tight_layout()
-        plt.show()
-    else:
-        # Plot ROC curve for training set only
+    if data_to_display in ['train', 'both']:
+        # Plot ROC curve for training set
         fig, ax = plt.subplots(1, 1, figsize=fig_size)
         RocCurveDisplay.from_estimator(model, X_train, y_train, ax=ax)
         ax.set_title('ROC Curve (Training)')
-        plt.tight_layout()
-        plt.show()
-        
+        if data_to_display == 'train':
+            plt.tight_layout()
+            plt.show()
+
+    if data_to_display in ['validation', 'both']:
+        if X_val is not None and y_val is not None:
+            # Plot ROC curve for validation set, adjust subplot if both are displayed
+            if data_to_display == 'both':
+                fig, axes = plt.subplots(1, 2, figsize=(fig_size[0] * 2, fig_size[1]))
+                RocCurveDisplay.from_estimator(model, X_train, y_train, ax=axes[0])
+                axes[0].set_title('ROC Curve (Training)')
+                RocCurveDisplay.from_estimator(model, X_val, y_val, ax=axes[1])
+                axes[1].set_title('ROC Curve (Validation)')
+            else:
+                fig, ax = plt.subplots(1, 1, figsize=fig_size)
+                RocCurveDisplay.from_estimator(model, X_val, y_val, ax=ax)
+                ax.set_title('ROC Curve (Validation)')
+            plt.tight_layout()
+            plt.show()
+        else:
+            print("Validation data not provided for requested 'validation' or 'both' reports.")
 
 
