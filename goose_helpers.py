@@ -356,33 +356,30 @@ def display_roc_curve(model, X_train, y_train, X_val=None, y_val=None, data_to_d
     data_to_display : str, default='train'
         Which data's ROC curve to display: 'train', 'validation', or 'both'.
     """
-    fig_size = (10, 5)
+    if data_to_display == 'both':
+        fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+        RocCurveDisplay.from_estimator(model, X_train, y_train, ax=axes[0])
+        axes[0].set_title('ROC Curve (Training)')
+        RocCurveDisplay.from_estimator(model, X_val, y_val, ax=axes[1])
+        axes[1].set_title('ROC Curve (Validation)')
+        plt.tight_layout()
+        plt.show()
 
-    if data_to_display in ['train', 'both']:
-        # Plot ROC curve for training set
-        fig, ax = plt.subplots(1, 1, figsize=fig_size)
+    elif data_to_display == 'train':
+        fig, ax = plt.subplots(1, 1, figsize=(10, 5))
         RocCurveDisplay.from_estimator(model, X_train, y_train, ax=ax)
         ax.set_title('ROC Curve (Training)')
-        if data_to_display == 'train':
-            plt.tight_layout()
-            plt.show()
+        plt.tight_layout()
+        plt.show()
 
-    if data_to_display in ['validation', 'both']:
+    elif data_to_display == 'validation':
         if X_val is not None and y_val is not None:
-            # Plot ROC curve for validation set, adjust subplot if both are displayed
-            if data_to_display == 'both':
-                fig, axes = plt.subplots(1, 2, figsize=(fig_size[0] * 2, fig_size[1]))
-                RocCurveDisplay.from_estimator(model, X_train, y_train, ax=axes[0])
-                axes[0].set_title('ROC Curve (Training)')
-                RocCurveDisplay.from_estimator(model, X_val, y_val, ax=axes[1])
-                axes[1].set_title('ROC Curve (Validation)')
-            else:
-                fig, ax = plt.subplots(1, 1, figsize=fig_size)
-                RocCurveDisplay.from_estimator(model, X_val, y_val, ax=ax)
-                ax.set_title('ROC Curve (Validation)')
+            fig, ax = plt.subplots(1, 1, figsize=(10, 5))
+            RocCurveDisplay.from_estimator(model, X_val, y_val, ax=ax)
+            ax.set_title('ROC Curve (Validation)')
             plt.tight_layout()
             plt.show()
         else:
-            print("Validation data not provided for requested 'validation' or 'both' reports.")
+            print("Validation data not provided for requested 'validation' report.")
 
 
