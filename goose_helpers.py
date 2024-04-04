@@ -312,11 +312,11 @@ def display_confusion_matrix(model, X_train, y_train, X_val=None, y_val=None, da
         cm_train = confusion_matrix(y_train, y_train_pred)
         if data_to_display == 'train':
             fig, ax = plt.subplots(1, 1, figsize=fig_size)
-            ConfusionMatrixDisplay(confusion_matrix=cm_train).plot(ax=ax)
+            ConfusionMatrixDisplay(confusion_matrix=cm_train, cmap='cividis').plot(ax=ax)
             ax.set_title('Confusion Matrix (Training)')
         else:  # If both, prepare subplot and plot training CM first
             fig, axes = plt.subplots(1, 2, figsize=(fig_size[0] * 2, fig_size[1]))
-            ConfusionMatrixDisplay(confusion_matrix=cm_train).plot(ax=axes[0])
+            ConfusionMatrixDisplay(confusion_matrix=cm_train, cmap='cividis').plot(ax=axes[0])
             axes[0].set_title('Confusion Matrix (Training)')
 
     if data_to_display in ['validation', 'both']:
@@ -326,10 +326,10 @@ def display_confusion_matrix(model, X_train, y_train, X_val=None, y_val=None, da
             cm_val = confusion_matrix(y_val, y_val_pred)
             if data_to_display == 'validation':
                 fig, ax = plt.subplots(1, 1, figsize=fig_size)
-                ConfusionMatrixDisplay(confusion_matrix=cm_val).plot(ax=ax)
+                ConfusionMatrixDisplay(confusion_matrix=cm_val, cmap='cividis').plot(ax=ax)
                 ax.set_title('Confusion Matrix (Validation)')
             else:  # For 'both', plot validation CM in second subplot
-                ConfusionMatrixDisplay(confusion_matrix=cm_val).plot(ax=axes[1])
+                ConfusionMatrixDisplay(confusion_matrix=cm_val, cmap='cividis').plot(ax=axes[1])
                 axes[1].set_title('Confusion Matrix (Validation)')
         else:
             print("Validation data not provided for requested 'validation' or 'both' reports.")
