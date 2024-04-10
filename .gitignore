@@ -1,3 +1,5 @@
 misc/
 __pycache__/
 .ipynb_checkpoints/
+ecommerce_purchase_prediction_files/
+ecommerce_purchase_prediction.md
