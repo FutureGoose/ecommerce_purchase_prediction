@@ -35,15 +35,15 @@ Carefully selected metrics guided our modeling focus:
 ## Project Structure 📁
 ```
 ecommerce_purchase_prediction/
-├── assets/                 # Project assets
-├── .gitignore              # Specifies intentionally untracked files to ignore
-├── LICENSE                 # Project license
-├── README.md               # Project readme (you are here)
-├── Uppdragsbeskrivning.pdf # Assignment description
-├── ecommerce_purchase_prediction.ipynb # Main project notebook
-├── goose_helpers.py        # Helper functions script
-├── project_data.csv        # Dataset used for the project
-└── requirements.txt        # Project dependencies
+├── assets/
+├── .gitignore
+├── LICENSE
+├── README.md
+├── Uppdragsbeskrivning.pdf
+├── ecommerce_purchase_prediction.ipynb
+├── goose_helpers.py
+├── project_data.csv
+└── requirements.txt
 ```
 
 ## Installation & Usage 🛠️
